@@ -1,15 +1,97 @@
-meme_dict = {
-            "CRINGE": "Algo excepcionalmente raro o embarazoso",
-            "LOL": "Una respuesta común a algo gracioso",
-            "67": "no tiene un significado fijo y suele usarse para decir «más o menos» o como broma",
-            "ROFL": "una respuesta a una broma"
-            "SHEESH" - "ligera desaprobación"
-            "CREEPY" - "aterrador, siniestro"
-            "AGGRO" - "ponerse agresivo/enojado"
-            }
-word = input("Ingresa la palabra que deseas conocer")
+import random
 
-if word in meme_dict.keys():
-    print(meme_dict[word])
-else:
-    print("Esa palabra no está en el diccionario")
+import discord
+from discord.ext import commands
+
+description = '''Un bot de ejemplo con varios comandos de utilidad.'''
+
+intents = discord.Intents.default()
+intents.members = True          # Actívalo también en el Developer Portal (Privileged Gateway Intents)
+intents.message_content = True
+
+# Un solo bot, con un solo prefijo
+bot = commands.Bot(command_prefix='$', description=description, intents=intents)
+
+
+@bot.event
+async def on_ready():
+    print(f'Logged in as {bot.user} (ID: {bot.user.id})')
+    print('------')
+
+
+# ---------- Comandos del primer código ----------
+
+@bot.command()
+async def add(ctx, left: int, right: int):
+    """Suma dos números."""
+    await ctx.send(left + right)
+
+
+@bot.command()
+async def roll(ctx, dice: str):
+    """Lanza dados en formato NdN."""
+    try:
+        rolls, limit = map(int, dice.split('d'))
+    except Exception:
+        await ctx.send('¡El formato debe ser NdN!')
+        return
+
+    result = ', '.join(str(random.randint(1, limit)) for r in range(rolls))
+    await ctx.send(result)
+
+
+@bot.command(description='Para cuando quieras decidir de otra forma')
+async def choose(ctx, *choices: str):
+    """Elige entre varias opciones."""
+    await ctx.send(random.choice(choices))
+
+
+@bot.command()
+async def repeat(ctx, times: int, content='repeating...'):
+    """Repite un mensaje varias veces."""
+    for i in range(times):
+        await ctx.send(content)
+
+
+@bot.command()
+async def joined(ctx, member: discord.Member):
+    """Dice cuándo se unió un miembro."""
+    await ctx.send(f'{member.name} joined {discord.utils.format_dt(member.joined_at)}')
+
+
+@bot.group()
+async def cool(ctx):
+    """Dice si un usuario es cool."""
+    if ctx.invoked_subcommand is None:
+        await ctx.send(f'No, {ctx.subcommand_passed} no es cool')
+
+
+@cool.command(name='bot')
+async def _bot(ctx):
+    """¿El bot es cool?"""
+    await ctx.send('Yes, the bot is cool.')
+
+
+# ---------- Comandos del segundo código ----------
+
+@bot.command()
+async def hello(ctx):
+    await ctx.send(f'Hola, soy un bot {bot.user}!')
+
+
+@bot.command()
+async def heh(ctx, count_heh=5):
+    await ctx.send("he" * int(count_heh))
+
+
+@bot.command()
+async def kodland(ctx):
+    for i in range(4):
+        await ctx.send("HOLA PROFEE")
+    await ctx.send("Buenas tardes :D")
+
+
+@bot.command()
+async def saludo(ctx):
+    await ctx.send("Buenas tardes :D")
+
