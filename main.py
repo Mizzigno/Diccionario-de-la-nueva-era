@@ -1,5 +1,6 @@
 import random
-
+import os
+import requests
 import discord
 from discord.ext import commands
 
@@ -94,4 +95,27 @@ async def kodland(ctx):
 @bot.command()
 async def saludo(ctx):
     await ctx.send("Buenas tardes :D")
+
+@bot.command()
+async def mem(ctx):
+    archivos = (os.listdir('images'))
+    foto = random.choice(archivos)
+    with open(f'images/{foto}', 'rb') as f:
+        # ¡Vamos a almacenar el archivo de la biblioteca Discord convertido en esta variable!
+        picture = discord.File(f)
+    # A continuación, podemos enviar este archivo como parámetro.
+    await ctx.send(file=picture)
+def get_duck_image_url():    
+    url = 'https://random-d.uk/api/random'
+    res = requests.get(url)
+    data = res.json()
+    return data['url']
+
+
+@bot.command('duck')
+async def duck(ctx):
+    '''Una vez que llamamos al comando duck, 
+    el programa llama a la función get_duck_image_url'''
+    image_url = get_duck_image_url()
+    await ctx.send(image_url)
 
