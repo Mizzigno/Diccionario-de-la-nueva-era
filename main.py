@@ -98,18 +98,49 @@ async def saludo(ctx):
 
 @bot.command()
 async def mem(ctx):
-    archivos = (os.listdir('images'))
+
+    # Probabilidades de cada rareza
+    rarezas = {
+        "Común": 60,
+        "Poco común": 25,
+        "Raro": 10,
+        "Épico": 4,
+        "Legendario": 1
+    }
+
+    # Elegimos una rareza al azar
+    rareza = random.choices(
+        list(rarezas.keys()),
+        weights=list(rarezas.values()),
+        k=1
+    )[0]
+
+    # Relacionamos cada rareza con su carpeta
+    carpetas = {
+        "Común": "comun",
+        "Poco común": "poco_comun",
+        "Raro": "raro",
+        "Épico": "epico",
+        "Legendario": "legendario"
+    }
+
+    # Obtenemos los memes de la carpeta elegida
+    carpeta = carpetas[rareza]
+    archivos = os.listdir(f"images/{carpeta}")
+
+    # Seleccionamos un meme aleatorio
     foto = random.choice(archivos)
-    with open(f'images/{foto}', 'rb') as f:
-        # ¡Vamos a almacenar el archivo de la biblioteca Discord convertido en esta variable!
+
+    # Abrimos la imagen
+    with open(f"images/{carpeta}/{foto}", "rb") as f:
         picture = discord.File(f)
-    # A continuación, podemos enviar este archivo como parámetro.
-    await ctx.send(file=picture)
-def get_duck_image_url():    
-    url = 'https://random-d.uk/api/random'
-    res = requests.get(url)
-    data = res.json()
-    return data['url']
+
+        # Enviamos el meme y su rareza
+        await ctx.send(
+            content=f"🎲 ¡Meme obtenido! Rareza: **{rareza}**",
+            file=picture
+        )
+
 
 
 @bot.command('duck')
@@ -118,4 +149,3 @@ async def duck(ctx):
     el programa llama a la función get_duck_image_url'''
     image_url = get_duck_image_url()
     await ctx.send(image_url)
-
